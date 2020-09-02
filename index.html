@@ -1,0 +1,167 @@
+<html>
+	<head>
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+		<script>
+
+			let register_index = 0;
+			let users = [];
+
+			function init(){
+				users = sessionStorage.savedUsers.split("$");
+				register_index = users.length - 1;
+
+				$("#id").val(users.length);
+
+				create_table();
+			}
+
+			function sort_table(){
+
+				sort_type = $("#sortby").val();
+
+				let listTable = $("tr");
+				
+				
+				for(let i = listTable.length - 1; i > 0; i--){
+					
+					let isSort = true;
+
+					for(let j = 0; j < i; j++){
+
+						let needSwap = false;
+
+						firstRow = listTable[j];
+						secondRow = listTable[j + 1];
+
+						firstRowValue = firstRow.querySelector(`.${sort_type}`).textContent;
+						secondRowValue = secondRow.querySelector(`.${sort_type}`).textContent;
+
+						//if value same, sort by ID
+						if(firstRowValue == secondRowValue){
+
+							firstRowValue = firstRow.querySelector(".id").textContent;
+							secondRowValue = secondRow.querySelector(".id").textContent;
+
+							if(firstRowValue > secondRowValue) needSwap = true;
+						}
+						else if(firstRowValue > secondRowValue) needSwap = true;
+
+						if(needSwap){
+							secondRow.after(firstRow);
+							isSort = false;
+
+							//update listTable
+							listTable = $("tr");
+
+						}
+					}
+
+					if(isSort) break;
+				}
+			}
+
+			function create_table(){
+				for(let i = 1; i < users.length; i++){
+
+					user = users[i].split(";");
+					row = document.createElement("tr");
+					row.innerHTML = `<td class="id">${i}</td><td class="username">${user[0]}</td><td class="occ">${user[1]}</td>`;
+					$("#listUser").append(row);
+				}
+			}
+
+			function update_row_by_sort(index, username, occ){
+
+				sort_type = $("#sortby").val();
+
+				let listTable = $("tr");
+
+				const newRow = document.createElement("tr");
+				newRow.innerHTML = `<td class="id">${index}</td><td class="username">${username}</td><td class="occ">${occ}</td>`;
+
+				for(let i = 0; i < listTable.length; i++){
+
+					let putBefore = false;
+
+					const oldRow = listTable[i];
+
+					oldRowValue = oldRow.querySelector(`.${sort_type}`).textContent;
+					newRowValue = newRow.querySelector(`.${sort_type}`).textContent;
+
+					if(newRowValue == oldRowValue){
+						//sort by id
+						oldRowValue = oldRow.querySelector(".id").textContent;
+
+						if(index < oldRowValue){
+							putBefore = true;
+						}
+					}
+					else if(newRowValue < oldRowValue){
+						putBefore = true;
+					}
+
+					if(putBefore){
+						oldRow.before(newRow);
+						return;
+					}
+				}
+
+				$("#listUser").append(newRow);
+			}
+
+			$(document).ready(() =>{
+
+				
+				//get all data from session storage and initialize necessary value
+				if(sessionStorage.savedUsers){
+					init();
+				}
+
+				//when user click submit button
+				$("form").submit( e => {
+
+					e.preventDefault();
+
+					const username = $("#name").val();
+					const occ = $("#occ").val();
+
+
+					sessionStorage.savedUsers += `$${username};${occ}`;
+
+					register_index++;
+
+					//update text id
+					$("#id").val(register_index + 1);
+
+					update_row_by_sort(register_index, username, occ);
+				});
+
+				//sort when user change sortby value
+				$("#sortby").change(() => sort_table());
+			});
+		</script>
+	</head>
+	<body>
+		<form>
+			<input type="text" id="id" value="1" disabled>
+			<input type="text" id="name" placeholder="Name" required>
+			<input type="text" id="occ" placeholder="Occupation" required>
+			<button id="submit" ">Add</button>
+		</form>
+
+		<label>Sort By:</label>
+		<select id="sortby">
+			<option value="id">UserID</option>
+			<option value="username">UserName</option>
+			<option value="occ">UserOccupation</option>
+		</select>
+
+		<table id="listUser">
+		</table>
+
+
+		<p>I used session storage (data deleted if tab or browser closed) instead of local storage since it just a testing and can be change if u want to</p> 
+	</body>
+</html>
+
