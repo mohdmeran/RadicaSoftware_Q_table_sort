@@ -22,7 +22,7 @@
 
 				let listTable = $("tr");
 				
-				
+				//use bubble sort to sort accordingly
 				for(let i = listTable.length - 1; i > 0; i--){
 					
 					let isSort = true;
@@ -80,6 +80,7 @@
 				const newRow = document.createElement("tr");
 				newRow.innerHTML = `<td class="id">${index}</td><td class="username">${username}</td><td class="occ">${occ}</td>`;
 
+				//iterate tru each row to append the newRow base on sorting selected
 				for(let i = 0; i < listTable.length; i++){
 
 					let putBefore = false;
@@ -112,8 +113,7 @@
 
 			$(document).ready(() =>{
 
-				
-				//get all data from session storage and initialize necessary value
+				//if data has been saved to session, get the data and init table and value
 				if(sessionStorage.savedUsers){
 					init();
 				}
@@ -161,7 +161,8 @@
 		</table>
 
 
-		<p>I used session storage (data deleted if tab or browser closed) instead of local storage since it just a testing and can be change if u want to</p> 
+		<p>I used session storage (data deleted if tab or browser closed) instead of local storage since it just a testing and can be change if u want to</p>
+		<p>I didnt consider user to put input like "$" and ";". so error may occur if they input this kind of value</p>
 	</body>
 </html>
 
